@@ -2,9 +2,9 @@ node{
   
 def mavenHome = tool name: "maven3.8.5"
 
-echo "Build number: ${env.BUILD_NUMBER}"
-//echo "Job name is: ${env.JOB_NAME}"
-echo "Node name is: ${env.NODE-NAME}"
+echo "Build number: ${env.BUILD_NUMBER} "
+//echo "Job name is: ${env.JOB_NAME} "
+echo "Node name is: ${env.NODE-NAME} "
 
 properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
 
@@ -38,7 +38,7 @@ finally{
 sendslacknotification(currentBuild.result)
 }//finally closing
 
-}//Node closing
+}//node closing
 
 
 def sendslacknotification(String buildStatus = 'STARTED') {
