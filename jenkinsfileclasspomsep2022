@@ -7,7 +7,8 @@ echo "Build number: ${env.BUILD_NUMBER}"
 echo "Node name is: ${env.NODE-NAME}"
 
 properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
-try[
+
+try{
 stage('CheckoutCode'){
 git branch: 'development', credentialsId: 'e5c77f6f-307f-419a-ac4f-5a2bb30c4bd4', url: 'https://github.com/mss-banking-sectr/maven-web-applicatio.git'
 
