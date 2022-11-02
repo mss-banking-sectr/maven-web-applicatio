@@ -1,0 +1,33 @@
+node{
+
+def mavenHome = tool name: "maven3.8.5"
+
+echo "Build number: ${env.BUILD_NUMBER}"
+//echo "Job name is: ${env.JOB_NAME}"
+echo "Node name is: ${env.NODE-NAME}"
+
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
+
+stage('checkoutCode'){
+git branch: 'development', credentialsId: 'e5c77f6f-307f-419a-ac4f-5a2bb30c4bd4', url: 'https://github.com/mss-banking-sectr/maven-web-applicatio.git'
+}
+
+stage('Build'){
+sh "${mavenHome}/bin/mvn clean package"
+}
+/*
+stage('ExecteSonarQubeReport'){
+sh "${mavenHome}/bin/mvn sonar:sonar"
+}
+
+stage('UploadArtifactintoNexus'){
+sh "${mavenHome}/bin/mvn deploy"
+}
+
+stage('DeployAppIntoTomcatServer'){
+sshagent(['40c9d29f-02fb-4f47-89fa-3a19336ba770']) {
+ sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@172.31.40.84:/opt/apache-tomcat-9.0.68/webapps/"
+}    
+}
+*/
+}//Node closing
