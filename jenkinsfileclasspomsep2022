@@ -7,7 +7,7 @@ echo "Build number: ${env.BUILD_NUMBER}"
 echo "Node name is: ${env.NODE-NAME}"
 
 properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
-
+try[
 stage('CheckoutCode'){
 git branch: 'development', credentialsId: 'e5c77f6f-307f-419a-ac4f-5a2bb30c4bd4', url: 'https://github.com/mss-banking-sectr/maven-web-applicatio.git'
 
@@ -30,5 +30,39 @@ sshagent(['40c9d29f-02fb-4f47-89fa-3a19336ba770']) {
 }
 }
 */
+}//try closing
+catch(e)
+currentBuild.result = "FAILURE"
+}//catch closing
+finally{
+sendslacknotification(currentBuild.result)
+}//finally closing
 
-}//Node Closing
+}//node closing
+
+
+def sendslacknotification(String buildStatus = 'STARTED') {
+  // build status of null means successful
+  buildStatus =  buildStatus ?: 'SUCCESSFUL'
+
+  // Default values
+  def colorName = 'RED'
+  def colorCode = '#FF0000'
+  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+  def summary = "${subject} (${env.BUILD_URL})"
+
+  // Override default values based on build status
+  if (buildStatus == 'STARTED') {
+    color = 'YELLOW'
+    colorCode = '#FFFF00'
+  } else if (buildStatus == 'SUCCESSFUL') {
+    color = 'GREEN'
+    colorCode = '#00FF00'
+  } else {
+    color = 'RED'
+    colorCode = '#FF0000'
+  }
+
+  // Send notifications
+  slackSend (color: colorCode, message: summary)
+}
